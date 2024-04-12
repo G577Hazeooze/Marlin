@@ -246,36 +246,6 @@ void menu_main() {
   START_MENU();
   BACK_ITEM(MSG_INFO_SCREEN);
 
-  #if HAS_MEDIA && !defined(MEDIA_MENU_AT_TOP) && !HAS_ENCODER_WHEEL
-    #define MEDIA_MENU_AT_TOP
-  #endif
-
-  if (busy) {
-    #if MACHINE_CAN_PAUSE
-      ACTION_ITEM(MSG_PAUSE_PRINT, ui.pause_print);
-    #endif
-    #if MACHINE_CAN_STOP
-      SUBMENU(MSG_STOP_PRINT, []{
-        MenuItem_confirm::select_screen(
-          GET_TEXT_F(MSG_BUTTON_STOP), GET_TEXT_F(MSG_BACK),
-          ui.abort_print, nullptr,
-          GET_TEXT_F(MSG_STOP_PRINT), (const char *)nullptr, F("?")
-        );
-      });
-    #endif
-
-    #if ENABLED(GCODE_REPEAT_MARKERS)
-      if (repeat.is_active())
-        ACTION_ITEM(MSG_END_LOOPS, repeat.cancel);
-    #endif
-
-    SUBMENU(MSG_TUNE, menu_tune);
-
-    #if ENABLED(CANCEL_OBJECTS) && DISABLED(SLIM_LCD_MENUS)
-      SUBMENU(MSG_CANCEL_OBJECT, []{ editable.int8 = -1; ui.goto_screen(menu_cancelobject); });
-    #endif
-  }
-  else {
     #if ALL(HAS_MEDIA, MEDIA_MENU_AT_TOP)
       // BEGIN MEDIA MENU
       if (card_detected) {
@@ -315,7 +285,42 @@ void menu_main() {
         #endif
       }
       // END MEDIA MENU
+    #endif						
+
+
+
+  if (busy) {
+    #if MACHINE_CAN_PAUSE
+      ACTION_ITEM(MSG_PAUSE_PRINT, ui.pause_print);
     #endif
+    #if MACHINE_CAN_STOP
+      SUBMENU(MSG_STOP_PRINT, []{
+        MenuItem_confirm::select_screen(
+          GET_TEXT_F(MSG_BUTTON_STOP), GET_TEXT_F(MSG_BACK),
+          ui.abort_print, nullptr,
+          GET_TEXT_F(MSG_STOP_PRINT), (const char *)nullptr, F("?")
+        );
+      });
+    #endif
+
+    #if ENABLED(GCODE_REPEAT_MARKERS)
+      if (repeat.is_active())
+        ACTION_ITEM(MSG_END_LOOPS, repeat.cancel);
+    #endif
+
+    SUBMENU(MSG_TUNE, menu_tune);
+
+    #if ENABLED(CANCEL_OBJECTS) && DISABLED(SLIM_LCD_MENUS)
+      SUBMENU(MSG_CANCEL_OBJECT, []{ editable.int8 = -1; ui.goto_screen(menu_cancelobject); });
+    #endif
+  }
+  else {
+	  
+	#if HAS_MEDIA && !defined(MEDIA_MENU_AT_TOP) && !HAS_ENCODER_WHEEL
+    #define MEDIA_MENU_AT_TOP
+	
+	#endif
+
 
     if (TERN0(MACHINE_CAN_PAUSE, printingIsPaused()))
       ACTION_ITEM(MSG_RESUME_PRINT, ui.resume_print);
